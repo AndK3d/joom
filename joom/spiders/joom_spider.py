@@ -84,9 +84,7 @@ class JoomSpider(scrapy.Spider):
     def parse_next(self, response):
 
         jsonresponse = json.loads(response.body_as_unicode())
-
         items = jsonresponse["contexts"][0]["value"]
-
         nextPageToken = jsonresponse["payload"]["nextPageToken"]
 
         for item in items:
@@ -95,21 +93,18 @@ class JoomSpider(scrapy.Spider):
                 'item_id': item["id"]
             }
 
-        # item = MyItem()
-        # item["item_id"] = jsonresponse["contexts"][0]["value"]
-
         print ("nextPageToken=", nextPageToken)
-        print("lenght =", len(items))
+        print("len =", len(items))
         body = '{"count":10,"pageToken":"%s","filters":[{"id":"categoryId","value":{"type":"categories","items":[{"id":"1473502937203552604-139-2-118-470466103"}]}}]}' % (nextPageToken)
-        print (body)
+        
         # next page
         token = self.getAccessToken()
         if len(items) > 0:
-            scrapy.Request(url="https://api.joom.com/1.1/search/products",
-                                 method='POST',
-                                 body=body,
-                                 headers={'Accept': '*/*',
-                                          'Authorization': 'Bearer ' + token,
-                                          'Content-Encoding': 'gzip'
+            yield scrapy.Request(url="https://api.joom.com/1.1/search/products",
+                           method='POST',
+                           body=body,
+                           headers={'Accept': '*/*',
+                                    'Authorization': 'Bearer ' + token,
+                                    'Content-Encoding': 'gzip'
                                           }
                            )
